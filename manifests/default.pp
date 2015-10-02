@@ -1,12 +1,12 @@
-exec { "apt-get update":
-  path => "/usr/bin",
-}
-package { "apache2" :
-  ensure => present,
-  require => Exec["apt-get update"],
-}
-service { "apache2" :
-  ensure => running,
-  require => Package["apache2"],
-}
+class { 'nginx': }
 
+nginx::resource::vhost { 'www.ember-phoenix-starter-app.com':
+  www_root => '/srv/www/ember-phoenix-starter-app',
+}
+nginx::resource::upstream { 'ember_phoenix_starter_app':
+  members => [
+    'localhost:3000',
+    'localhost:3001',
+    'localhost:3002',
+  ],
+}
