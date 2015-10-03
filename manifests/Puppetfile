@@ -10,4 +10,7 @@ mod 'concat',
   :git => "https://github.com/puppetlabs/puppetlabs-concat"
   
 mod "nginx",
-  :git => "git://github.com/jfryman/puppet-nginx.git"
+  :git => "https://github.com/jfryman/puppet-nginx"
+  
+mod "postgresql",
+  :git => "https://github.com/puppetlabs/puppetlabs-postgresql"

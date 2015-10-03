@@ -1,3 +1,23 @@
+class { 'apt': }
+
+package { [
+    'build-essential',
+    'vim',
+    'curl',
+    'zsh',
+    'git-core'
+  ]:
+  ensure  => 'installed',
+}
+
+package { 'erlang':
+  ensure => '1:18.1',
+}
+
+package { 'elixir':
+  ensure => '1.1.0-1',
+}
+
 class { 'nginx': }
 
 nginx::resource::vhost { 'www.ember-phoenix-starter-app.com':
@@ -10,3 +30,5 @@ nginx::resource::upstream { 'ember_phoenix_starter_app':
     'localhost:3002',
   ],
 }
+
+class { 'postgresql::server': }
