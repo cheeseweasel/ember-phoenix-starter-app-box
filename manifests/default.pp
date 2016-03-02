@@ -6,7 +6,8 @@ package { [
     'curl',
     'zsh',
     'git-core',
-	'esl-erlang'
+	'esl-erlang',
+	'nodejs'
   ]:
   ensure  => 'installed',
 }
