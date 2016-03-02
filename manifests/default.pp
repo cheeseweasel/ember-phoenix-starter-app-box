@@ -5,17 +5,23 @@ package { [
     'vim',
     'curl',
     'zsh',
-    'git-core'
+    'git-core',
+	'esl-erlang'
   ]:
   ensure  => 'installed',
 }
 
-package { 'erlang':
-  ensure => '1:18.1',
+package { 'elixir':
+  require => package['esl-erlang']
 }
 
-package { 'elixir':
-  ensure => '1.1.0-1',
+exec { 'install-hex-phoenix':
+  command => 'mix local.hex --force && mix archive.install https://github.com/phoenixframework/archives/raw/master/phoenix_new.ez --force',
+  require => package['elixir'],
+  user => 'vagrant',
+  logoutput => 'true',
+  environment => ["HOME=/home/vagrant"],
+  path => ['/usr/bin', '/usr/local/bin', '/usr/bin/erl', '/usr/bin/X11/erl', '/usr/bin/X11', '/bin'],
 }
 
 class { 'nginx': }
