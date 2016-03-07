@@ -12,6 +12,9 @@ $rootScript = <<SCRIPT
   sudo apt-get update -y
   sudo apt-get install -y git
   sudo apt-get install -y librarian-puppet
+  sudo apt-get install -y autotools-dev
+  sudo apt-get install -y automake
+  sudo apt-get install -y python-dev
   sudo cp /home/vagrant/puppet/Puppetfile /etc/puppet
   cd /etc/puppet && librarian-puppet install --verbose
   mkdir -p /etc/nginx/sites-available
@@ -28,6 +31,15 @@ $userScript = <<SCRIPT
   nvm alias default 0.10.43
   npm -g install npm@latest
   npm install -g bower ember-cli
+
+  git clone https://github.com/facebook/watchman.git
+  cd watchman
+  git checkout v4.5.0  # the latest stable release
+  ./autogen.sh
+  ./configure
+  make
+  sudo make install
+  sudo sysctl fs.inotify.max_user_watches=524288
 SCRIPT
 
 

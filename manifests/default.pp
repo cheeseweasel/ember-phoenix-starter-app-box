@@ -26,8 +26,13 @@ exec { 'install-hex-phoenix':
 
 class { 'nginx': }
 
-nginx::resource::vhost { 'www.ember-phoenix-starter-app.com':
-  www_root => '/srv/www/ember-phoenix-starter-app',
+nginx::resource::vhost { 'client':
+  listen_port => 80,
+  proxy => 'http://localhost:4200/',
+}
+nginx::resource::vhost { 'server':
+  listen_port => 4000,
+  www_root => '/srv/www/ember-phoenix-starter-app/server',
 }
 nginx::resource::upstream { 'ember_phoenix_starter_app':
   members => [
