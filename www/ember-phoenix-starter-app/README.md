@@ -1,1 +1,0 @@
-# ember-phoenix-starter-app
