@@ -6,8 +6,7 @@ package { [
     'curl',
     'zsh',
     'git-core',
-	'esl-erlang',
-	'nodejs'
+    'esl-erlang',
   ]:
   ensure  => 'installed',
 }
@@ -39,3 +38,19 @@ nginx::resource::upstream { 'ember_phoenix_starter_app':
 }
 
 class { 'postgresql::server': }
+  
+postgresql::server::role { 'postgres':
+  password_hash => postgresql_password('postgres', 'postgres'),
+  createdb  => true
+}
+  
+postgresql::server::db { 'phoenix_development':
+  user     => 'postgres',
+  password => postgresql_password('postgres', 'postgres'),
+}
+  
+postgresql::server::db { 'phoenix_test':
+  user     => 'postgres',
+  password => postgresql_password('postgres', 'postgres'),
+}
+

@@ -5,6 +5,32 @@
 # configures the configuration version (we support older styles for
 # backwards compatibility). Please don't change it unless you know what
 # you're doing.
+
+$rootScript = <<SCRIPT
+  wget http://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+  sudo dpkg -i erlang-solutions_1.0_all.deb
+  sudo apt-get update -y
+  sudo apt-get install -y git
+  sudo apt-get install -y librarian-puppet
+  sudo cp /home/vagrant/puppet/Puppetfile /etc/puppet
+  cd /etc/puppet && librarian-puppet install --verbose
+  mkdir -p /etc/nginx/sites-available
+  mkdir -p /etc/nginx/sites-enabled
+
+SCRIPT
+
+$userScript = <<SCRIPT
+  cd /home/vagrant
+  wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh
+  export NVM_DIR="/home/vagrant/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+  nvm install 0.10.43
+  nvm alias default 0.10.43
+  npm -g install npm@latest
+  npm install -g bower ember-cli
+SCRIPT
+
+
 Vagrant.configure(2) do |config|
   # The most common configuration options are documented and commented below.
   # For a complete reference, please see the online documentation at
@@ -65,15 +91,9 @@ Vagrant.configure(2) do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
-    wget http://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
-    sudo dpkg -i erlang-solutions_1.0_all.deb
-    sudo apt-get update -y
-    sudo apt-get install -y git
-    sudo apt-get install -y librarian-puppet
-	sudo cp /home/vagrant/puppet/Puppetfile /etc/puppet
-    cd /etc/puppet && librarian-puppet install --verbose
-  SHELL
+  
+  config.vm.provision "shell", inline: $rootScript
+  config.vm.provision "shell", inline: $userScript, privileged: false
     
   config.vm.provision :puppet
 end
