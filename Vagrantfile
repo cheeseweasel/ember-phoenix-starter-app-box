@@ -27,10 +27,18 @@ $userScript = <<SCRIPT
   wget -qO- https://raw.github.com/creationix/nvm/master/install.sh | sh
   export NVM_DIR="/home/vagrant/.nvm"
   [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
-  nvm install 0.10.43
-  nvm alias default 0.10.43
+  nvm install 4.4.0
+  nvm alias default 4.4.0
   npm -g install npm@latest
   npm install -g bower ember-cli
+  
+  if ! grep -qe "^export NVM_DIR" "/home/vagrant/.bashrc"; then
+	echo '' >> /home/vagrant/.bashrc  
+	echo '# Adding NVM setup' >> /home/vagrant/.bashrc  
+    echo 'export NVM_DIR="/home/vagrant/.nvm"' >> /home/vagrant/.bashrc  
+    echo '[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"' >> /home/vagrant/.bashrc  
+	echo '' >> /home/vagrant/.bashrc  
+  fi
 
   git clone https://github.com/facebook/watchman.git
   cd watchman
@@ -40,6 +48,21 @@ $userScript = <<SCRIPT
   make
   sudo make install
   sudo sysctl fs.inotify.max_user_watches=524288
+  
+    
+  mkdir -p /srv/www/ember-phoenix-starter-app-box/client/node_modules
+  mkdir -p /srv/www/ember-phoenix-starter-app-box/client/bower_components
+  mkdir -p /home/vagrant/client_node_modules
+  mkdir -p /home/vagrant/client_bower_components
+  
+  
+  if ! grep -qe "^mount --bind ~/client_node_modules" "/home/vagrant/.bashrc"; then
+	echo ''  >> /home/vagrant/.bashrc  
+	echo "# mounting ~/client_node_modules" >> /home/vagrant/.bashrc 
+    echo 'sudo mount --bind ~/client_node_modules /srv/www/ember-phoenix-starter-app-box/client/node_modules' >> /home/vagrant/.bashrc  
+    echo 'sudo mount --bind ~/client_bower_components /srv/www/ember-phoenix-starter-app-box/client/bower_components' >> /home/vagrant/.bashrc  
+	echo ''  >> /home/vagrant/.bashrc  
+  fi
 SCRIPT
 
 
@@ -61,6 +84,7 @@ Vagrant.configure(2) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   config.vm.network "forwarded_port", guest: 80, host: 3000
+  config.vm.network "forwarded_port", guest: 49152, host: 49152
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -76,19 +100,19 @@ Vagrant.configure(2) do |config|
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
   config.vm.synced_folder "manifests", "/home/vagrant/puppet"
-  config.vm.synced_folder "www", "/srv/www"
+  config.vm.synced_folder "www", "/srv/www", type: "rsync", rsync__exclude: ".git/", rsync__auto: "true"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
+  config.vm.provider "virtualbox" do |vb|
   #   # Display the VirtualBox GUI when booting the machine
   #   vb.gui = true
   #
   #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+    vb.memory = "1024"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
